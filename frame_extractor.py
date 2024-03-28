@@ -14,67 +14,75 @@ import os
 import glob
 from skimage.metrics import structural_similarity as ssim
 
-def extractFrames(video_path:str):
-    file_name = video_path #= !ls
-    cap = cv2.VideoCapture(file_name)
+def get_video_prop(video_path:str):
+    cap = cv2.VideoCapture(video_path)
 
-    # Total number of frames in video
     n_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    print("Total number of Frames:",n_frames)
+    print(f"Total number of Frames: {n_frames}")
 
-    # Video height and width
     height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
     width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
     print(f'Height {height}, Width {width}')
 
-    # Get frames per second
     fps = cap.get(cv2.CAP_PROP_FPS)
     print(f'FPS : {fps:0.2f}')
 
-    # Prepare the folder
-    path = "key_frames"
-    isExist = os.path.exists(path)
-    if not isExist:
-        os.makedirs(path)
+    cap.release()
+    
+    return n_frames, fps, height, width
 
-    files = glob.glob('key_frames/*')
-    for f in files:
-        os.remove(f)
+def prepare_output_dir(output_path:str):
+    isExist = os.path.exists(output_path)
+    if isExist:
+        old_files = glob.glob(output_path+'/*')
+        for f in old_files:
+            os.remove(f)
+    else:
+        os.makedirs(output_path)
+    
+    return output_path
 
-    # Extraction
-    output_directory = 'key_frames'
-    os.makedirs(output_directory, exist_ok=True)
+def compare_frames(img1,img2):
+    b, g, r = cv2.split(img1)
+    prev_b, prev_g, prev_r = cv2.split(img2)
+    ssim_b, _ = ssim(prev_b, b, full=True)
+    ssim_g, _ = ssim(prev_g, g, full=True)
+    ssim_r, _ = ssim(prev_r, r, full=True)
+    #print(f"ssim_b:{ssim_b}, ssim_g:{ssim_g}, ssim_r:{ssim_r}")
+
+    similarity_score = (ssim_b + ssim_g + ssim_r) / 3
+    #print(f"ssim Score: {similarity_score}")
+
+    return similarity_score
+
+def extract_keyframes(video_path:str, output_dir:str):  
+    cap = cv2.VideoCapture(video_path)
+    
+    keyframes_dir = prepare_output_dir(output_dir)
+
+    # KeyFrame Extraction
     key_frames = []
     previous_frame = None
-    threshold = 0.4  # threshold 
+    similarity_threshold = 0.3 #range -1(dissimilar) to 1(identical)  
+    total_frames, fps, height, width = get_video_prop(video_path)
 
-    for frame_idx in tqdm(range(n_frames), desc="Processing Frames"):
+    for current_frame in tqdm(range(total_frames), desc="Extracting Keyframes"):
         ret, img = cap.read()
 
         if not ret:
+            print("Error: Can't access frame")
             break
 
-        # Splitting the frame into RGB channels
-        b, g, r = cv2.split(img)
-
         if previous_frame is not None:
-            # Structural Similarity Index (SSI) for each channel
-            ssim_b, _ = ssim(previous_frame[0], b, full=True)
-            ssim_g, _ = ssim(previous_frame[1], g, full=True)
-            ssim_r, _ = ssim(previous_frame[2], r, full=True)
-
-            # Combining the SSIM scores from each channel
-            similarity_index = (ssim_b + ssim_g + ssim_r) / 3
-
-            # If frames are distinct enough, then only adding the current frame to the selected frames
-            if similarity_index < threshold:
+            # Structural Similarity Index (SSI)
+            similarity_score = compare_frames(img,previous_frame)
+            if similarity_score < similarity_threshold:
                 key_frames.append(img)
-
                 # Saving the selected frame to the output directory
-                frame_filename = os.path.join(output_directory, f"frame_{frame_idx:04d}.png")
+                frame_filename = os.path.join(keyframes_dir, f"frame_{current_frame:04d}.png")
                 cv2.imwrite(frame_filename, img)
 
-        previous_frame = cv2.split(img)
+        previous_frame = img
 
     cap.release()
 

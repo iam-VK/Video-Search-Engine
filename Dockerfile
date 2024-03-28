@@ -1,6 +1,6 @@
 FROM python:3.12.1-alpine
 WORKDIR /app
-COPY swimming_pool_360p.mp4 \ 
+COPY Videos/swimming_pool_360p.mp4 \ 
     frame_extractor.py      \
     img_to_text_model.py    \
     main.py                 \

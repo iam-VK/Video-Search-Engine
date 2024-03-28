@@ -2,9 +2,12 @@
 *.jpg
 *.mkv
 *.txt
-!requirements.txt
-Model/
+__pycache__/
 venv/
 key_frames/
-__pycache__/
+keyframes/
+Model/
 temp.py
+
+# don't ignore
+!requirements.txt

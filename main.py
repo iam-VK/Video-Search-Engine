@@ -1,19 +1,20 @@
-from frame_extractor import extractFrames
-from img_to_text_model import process_batch_img2txt,load_img
+from frame_extractor import extract_keyframes
+from img_to_text_model import batch_img_captioning
 from summarizer_model import summarize
 import sys
 
 if len(sys.argv) > 1:
-    extractFrames(sys.argv[1])
+    extract_keyframes(sys.argv[1])
 else:
     print('''Path to video missing !! ''')
     vid_path = input("Video Path: ")
     if vid_path:
-        extractFrames(vid_path)
+        extract_keyframes(vid_path,output_dir="key_frames")
     else:
-        extractFrames("swimming_pool_360p.mp4")
+        extract_keyframes(video_path="Videos/swimming_pool_360p.mp4",output_dir="keyframes")
     #sys.exit()
 
-process_batch_img2txt(load_img('key_frames'))
+batch_img_captioning('key_frames')
 
 summarize()
+#9.6+8.66+8.77+8.88+8.55=8.89
