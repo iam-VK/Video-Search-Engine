@@ -7,3 +7,4 @@ Model/
 venv/
 key_frames/
 __pycache__/
+temp.py

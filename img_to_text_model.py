@@ -23,7 +23,7 @@ def img2text(image_paths):
 
   inputs = processor(images, return_tensors="pt")
 
-  out = model.generate(**inputs)
+  out = model.generate(**inputs,max_length=250)
   #print(processor.decode(out[0], skip_special_tokens=True))
   predictions = processor.decode(out[0], skip_special_tokens=True)
   return predictions
@@ -42,9 +42,8 @@ def process_batch_img2txt(img_list:list):
   img_desc = []
   os.remove("img2txt.txt")
   file = open("img2txt.txt","a")
-  for img in tqdm(range(0,len(img_list)), desc="Processed Images"):
+  for img in tqdm(range(0,len(img_list),5), desc="Processed Images"):
     text = img2text(img_list[img])
-    text = text#[0]
     img_desc.append(text)
     file.write(text+"\n")
 

@@ -6,9 +6,12 @@ import sys
 if len(sys.argv) > 1:
     extractFrames(sys.argv[1])
 else:
-    print('''Path to video missing !! 
-          Using default video''')
-    extractFrames("swimming pool 360p.mp4")
+    print('''Path to video missing !! ''')
+    vid_path = input("Video Path: ")
+    if vid_path:
+        extractFrames(vid_path)
+    else:
+        extractFrames("swimming_pool_360p.mp4")
     #sys.exit()
 
 process_batch_img2txt(load_img('key_frames'))
