@@ -1,0 +1,9 @@
+*.mp4
+*.jpg
+*.mkv
+*.txt
+!requirements.txt
+Model/
+venv/
+key_frames/
+__pycache__/
