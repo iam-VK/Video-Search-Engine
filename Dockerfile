@@ -1,7 +1,7 @@
-FROM python:3.12.1-alpine
-WORKDIR /app
-COPY Videos/swimming_pool_360p.mp4 \ 
-    frame_extractor.py      \
+FROM python:3.12
+
+WORKDIR /app 
+COPY frame_extractor.py      \
     img_to_text_model.py    \
     main.py                 \
     summarizer_model.py     \
@@ -10,6 +10,9 @@ COPY Videos/swimming_pool_360p.mp4 \
     Model/                  \
     /app/
 
-RUN source venv/Scripts/activate
-RUN pip install -r requirements.txt
-CMD [ "python", "main.py"]
+COPY Videos/swimming_pool_360p.mp4 /Videos/
+
+RUN pip install --upgrade pip
+RUN source venv/bin/activate  
+
+CMD ["python", "main.py"]

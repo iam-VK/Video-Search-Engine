@@ -4,7 +4,7 @@ from summarizer_model import summarize
 import sys
 
 if len(sys.argv) > 1:
-    extract_keyframes(sys.argv[1])
+    extract_keyframes(sys.argv[1], output_dir="key_frames")
 else:
     print('''Path to video missing !! ''')
     vid_path = input("Video Path: ")
