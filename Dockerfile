@@ -7,12 +7,21 @@ COPY frame_extractor.py      \
     summarizer_model.py     \
     requirements.txt        \
     venv/                   \
-    Model/                  \
     /app/
 
-COPY Videos/swimming_pool_360p.mp4 /Videos/
+RUN mkdir /Model
+RUN mkdir /Model/bart-large-cnn/
+RUN mkdir /Model/blip-image-captioning-large/
 
-RUN pip install --upgrade pip
-RUN source venv/bin/activate  
+COPY Model/bart-large-cnn/ /Model/bart-large-cnn/
+COPY Model/blip-image-captioning-large/ /Model/blip-image-captioning-large/
+
+RUN mkdir /Videos
+COPY Videos/swimming_pool_360p.mp4 Videos/
+
+RUN pip install -r requirements.txt
+
+RUN apt update
+RUN apt-get install libgl1-mesa-glx -y
 
 CMD ["python", "main.py"]

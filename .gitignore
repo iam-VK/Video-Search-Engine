@@ -2,6 +2,7 @@
 *.jpg
 *.mkv
 *.txt
+*.wav
 __pycache__/
 venv/
 key_frames/

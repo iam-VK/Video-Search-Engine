@@ -11,7 +11,7 @@ else:
     if vid_path:
         extract_keyframes(vid_path,output_dir="key_frames")
     else:
-        extract_keyframes(video_path="Videos/swimming_pool_360p.mp4",output_dir="keyframes")
+        extract_keyframes(video_path="Videos/swimming_pool_360p.mp4",output_dir="key_frames")
     #sys.exit()
 
 batch_img_captioning('key_frames')

@@ -9,8 +9,8 @@ from tqdm import tqdm
 from transformers import BlipProcessor, BlipForConditionalGeneration
 
 def img_captioning_model(image_path):
-  img_preprocessor = BlipProcessor.from_pretrained("Model\\blip-image-captioning-large")
-  img_caption_model = BlipForConditionalGeneration.from_pretrained("Model\\blip-image-captioning-large")
+  img_preprocessor = BlipProcessor.from_pretrained("Model/blip-image-captioning-large")
+  img_caption_model = BlipForConditionalGeneration.from_pretrained("Model/blip-image-captioning-large")
 
   input_img = Image.open(image_path)
   img_input = img_preprocessor(input_img, return_tensors="pt")
@@ -22,7 +22,7 @@ def load_img_pathToList (keyframes_dir_path:str):
   keyframes_path_list = []
   for file in os.listdir(keyframes_dir_path):
     if file.endswith(".png"):
-        keyframes_path_list.append("key_frames\\"+file)
+        keyframes_path_list.append("key_frames/"+file)
   return keyframes_path_list
 
 def convert_to_rgb(image_path):
@@ -31,8 +31,11 @@ def convert_to_rgb(image_path):
     image = image.convert(mode="RGB")
 
 def batch_img_captioning(keyframes_dir_path):
-  os.remove("img2txt.txt")
-
+  try:
+    os.remove("img2txt.txt")
+  except FileNotFoundError as e:
+    pass
+  
   keyframes_path_list = load_img_pathToList(keyframes_dir_path)
 
   file = open("img2txt.txt","a")
