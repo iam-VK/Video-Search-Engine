@@ -9,8 +9,8 @@ from tqdm import tqdm
 from transformers import BlipProcessor, BlipForConditionalGeneration
 
 def img_captioning_model(image_path):
-  img_preprocessor = BlipProcessor.from_pretrained("Model/blip-image-captioning-large")
-  img_caption_model = BlipForConditionalGeneration.from_pretrained("Model/blip-image-captioning-large")
+  img_preprocessor = BlipProcessor.from_pretrained("/Model/blip-image-captioning-large")
+  img_caption_model = BlipForConditionalGeneration.from_pretrained("/Model/blip-image-captioning-large")
 
   input_img = Image.open(image_path)
   img_input = img_preprocessor(input_img, return_tensors="pt")

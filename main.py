@@ -6,12 +6,13 @@ import sys
 if len(sys.argv) > 1:
     extract_keyframes(sys.argv[1], output_dir="key_frames")
 else:
-    print('''Path to video missing !! ''')
+    print('''Path to video missing !!''')
+    #extract_keyframes(video_path="/Videos/swimming_pool_360p.mp4",output_dir="key_frames")
     vid_path = input("Video Path: ")
     if vid_path:
         extract_keyframes(vid_path,output_dir="key_frames")
     else:
-        extract_keyframes(video_path="Videos/swimming_pool_360p.mp4",output_dir="key_frames")
+        extract_keyframes(video_path="/Videos/swimming_pool_360p.mp4",output_dir="key_frames")
     #sys.exit()
 
 batch_img_captioning('key_frames')

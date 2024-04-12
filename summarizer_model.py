@@ -1,7 +1,7 @@
 from transformers import AutoTokenizer, BartForConditionalGeneration
 def summarize(file_path="img2txt.txt"):
-    model = BartForConditionalGeneration.from_pretrained("Model/bart-large-cnn")
-    tokenizer = AutoTokenizer.from_pretrained("Model/bart-large-cnn")
+    model = BartForConditionalGeneration.from_pretrained("/Model/bart-large-cnn")
+    tokenizer = AutoTokenizer.from_pretrained("/Model/bart-large-cnn")
 
     input_text = ""
 
