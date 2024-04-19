@@ -55,7 +55,7 @@ def compare_frames(img1,img2):
 
     return similarity_score
 
-def extract_keyframes(video_path:str, output_dir:str):  
+def extract_keyframes(video_path:str, output_dir:str="key_frames",frame_rate:int=3,threshold:int=0.3):  
     cap = cv2.VideoCapture(video_path)
     
     keyframes_dir = prepare_output_dir(output_dir)
@@ -63,10 +63,10 @@ def extract_keyframes(video_path:str, output_dir:str):
     # KeyFrame Extraction
     key_frames = []
     previous_frame = None
-    similarity_threshold = 0.3 #range -1(dissimilar) to 1(identical)  
+    similarity_threshold = threshold #(not sure) range -1(dissimilar) to 1(identical)  
     total_frames, fps, height, width = get_video_prop(video_path)
 
-    for current_frame in tqdm(range(total_frames), desc="Extracting Keyframes"):
+    for current_frame in tqdm(range(0,total_frames,frame_rate), desc="Extracting Keyframes"):
         ret, img = cap.read()
 
         if not ret:
@@ -81,6 +81,8 @@ def extract_keyframes(video_path:str, output_dir:str):
                 # Saving the selected frame to the output directory
                 frame_filename = os.path.join(keyframes_dir, f"frame_{current_frame:04d}.png")
                 cv2.imwrite(frame_filename, img)
+            else:
+                frame_filename = os.path.join(keyframes_dir, f"frame_{current_frame:04d}.png")
 
         previous_frame = img
 

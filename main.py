@@ -1,6 +1,5 @@
 from frame_extractor import extract_keyframes
-from img_to_text_model import batch_img_captioning
-from summarizer_model import summarize
+from image_classifier import img_classification_model
 import sys
 
 if len(sys.argv) > 1:
@@ -12,10 +11,8 @@ else:
     if vid_path:
         extract_keyframes(vid_path,output_dir="key_frames")
     else:
-        extract_keyframes(video_path="/Videos/swimming_pool_360p.mp4",output_dir="key_frames")
-    #sys.exit()
+        extract_keyframes(video_path="Videos/swimming_pool_360p.mp4",output_dir="key_frames",frame_rate=2,threshold=0.2)
 
-batch_img_captioning('key_frames')
+img_classification_model('key_frames')
 
-summarize()
 #9.6+8.66+8.77+8.88+8.55=8.89

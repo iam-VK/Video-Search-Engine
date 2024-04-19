@@ -3,12 +3,14 @@
 *.mkv
 *.txt
 *.wav
+*.json
 __pycache__/
 venv/
 key_frames/
 keyframes/
-Model/
+Models/
 temp.py
 
 # don't ignore
 !requirements.txt
+!ImageNet_classes.json
