@@ -13,6 +13,7 @@ from tqdm import tqdm
 import os
 import glob
 from skimage.metrics import structural_similarity as ssim
+import numpy as np
 
 def get_video_prop(video_path:str):
     cap = cv2.VideoCapture(video_path)
@@ -55,7 +56,7 @@ def compare_frames(img1,img2):
 
     return similarity_score
 
-def extract_keyframes(video_path:str, output_dir:str="key_frames",frame_rate:int=3,threshold:int=0.3):  
+def extract_keyframes(video_path:str, output_dir:str="key_frames",skip_frame_rate:int=3,threshold:int=0.3):  
     cap = cv2.VideoCapture(video_path)
     
     keyframes_dir = prepare_output_dir(output_dir)
@@ -66,7 +67,7 @@ def extract_keyframes(video_path:str, output_dir:str="key_frames",frame_rate:int
     similarity_threshold = threshold #(not sure) range -1(dissimilar) to 1(identical)  
     total_frames, fps, height, width = get_video_prop(video_path)
 
-    for current_frame in tqdm(range(0,total_frames,frame_rate), desc="Extracting Keyframes"):
+    for current_frame in tqdm(range(0,total_frames,skip_frame_rate), desc="Extracting Keyframes"):
         ret, img = cap.read()
 
         if not ret:
@@ -83,9 +84,47 @@ def extract_keyframes(video_path:str, output_dir:str="key_frames",frame_rate:int
                 cv2.imwrite(frame_filename, img)
             else:
                 frame_filename = os.path.join(keyframes_dir, f"frame_{current_frame:04d}.png")
+        else:
+            key_frames.append(img)
+            # Saving the selected frame to the output directory
+            frame_filename = os.path.join(keyframes_dir, f"frame_{current_frame:04d}.png")
+            cv2.imwrite(frame_filename, img)
 
         previous_frame = img
 
     cap.release()
 
     print(f'Total key frames based on the threshold chosen : {len(key_frames)}')
+
+def calculate_mse(image1, image2):
+    err = np.sum((image1.astype("float") - image2.astype("float")) ** 2)
+    err /= float(image1.shape[0] * image1.shape[1])
+    return err
+
+def extract_keyframes_2(video_path:str, output_dir:str='key_frames',skip_frame_rate:int=3, threshold=8000):
+    cap = cv2.VideoCapture(video_path)
+    prev_frame = None
+
+    prepare_output_dir(output_dir)
+
+    total_frames, fps, height, width = get_video_prop(video_path)
+
+    for current_frame in tqdm(range(0, total_frames, skip_frame_rate), desc="Extracting Keyframes",unit='frame', ncols=100):
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        if prev_frame is not None:
+                mse = calculate_mse(prev_frame, frame)
+                if mse > threshold:
+                    # Save dissimilar frame
+                    frame_filename = os.path.join(output_dir, f"frame_{current_frame:04d}.png")
+                    cv2.imwrite(frame_filename, frame)
+        else:
+                frame_filename = os.path.join(output_dir, f"frame_{current_frame:04d}.png")
+                cv2.imwrite(frame_filename, frame)    
+
+        prev_frame = frame
+
+    cap.release()
+    print("\nExtraction complete.")
