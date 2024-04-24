@@ -24,8 +24,11 @@ DROP TABLE IF EXISTS `videos`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `videos` (
   `video_id` int NOT NULL AUTO_INCREMENT,
-  `filename` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`video_id`)
+  `file_name` varchar(255) DEFAULT NULL,
+  `file_path` varchar(255) DEFAULT NULL,
+  `index_state` int DEFAULT '0',
+  PRIMARY KEY (`video_id`),
+  CONSTRAINT `videos_chk_1` CHECK (((`index_state` = 0) or (`index_state` = 1)))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -69,10 +72,10 @@ DROP TABLE IF EXISTS `video_categories`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `video_categories` (
-  `video_id` int NOT NULL,
+  `video_id` int DEFAULT NULL,
   `category_id` varchar(20) DEFAULT NULL,
   `frequency` int DEFAULT NULL,
-  PRIMARY KEY (`video_id`),
+  KEY `video_id` (`video_id`),
   KEY `category_id` (`category_id`),
   CONSTRAINT `video_categories_ibfk_1` FOREIGN KEY (`video_id`) REFERENCES `videos` (`video_id`),
   CONSTRAINT `video_categories_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`)
@@ -97,4 +100,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-04-23 23:09:54
+-- Dump completed on 2024-04-24 19:15:28
