@@ -6,8 +6,7 @@ source venv/bin/activate
 echo Downloading NLP models from HuggingFace Hub
 mkdir Models
 cd /Models
-git clone https://huggingface.co/SamLowe/roberta-base-go_emotions
-git clone https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest
+git clone https://huggingface.co/google/vit-base-patch16-224
 
 cd ..
 echo Installing Python libraries

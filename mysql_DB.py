@@ -1,9 +1,11 @@
 import mysql.connector
 import json
+import glob
 from MY_modules import vidName_from_path
 
-'''mysqldump -u groot -p search_engine videos categories video_categories > "D:\\Code Space\\Projects\\Video Transcriptio
-n\\DB_Backup.sql"'''
+'''
+mysqldump -u groot -p search_engine videos categories video_categories > "D:\\Code Space\\Projects\\Video Transcription\\DB_Backup.sql"
+'''
 
 db = mysql.connector.connect(
     host="localhost",
@@ -43,10 +45,11 @@ def insert_videos(vid_dir:str="Videos"):
     dbcursor = db.cursor()
 
     try:
-        vid_files = vidName_from_path(vid_dir_path="Videos")
-
-        for file_name in vid_files:
-            query = f"SELECT filename from videos where filename='{file_name}'"
+        vid_files = vidName_from_path(vid_dir_path=vid_dir)
+        vid_paths = glob.glob(vid_dir+'/*')
+        vid_paths = [path.replace('\\', '/') for path in vid_paths]
+        for i,file_name in enumerate(vid_files):
+            query = f"SELECT file_name from videos where file_name='{file_name}'"
             dbcursor.execute(query)
             result=dbcursor.fetchone()
 
@@ -54,7 +57,7 @@ def insert_videos(vid_dir:str="Videos"):
                 print(f"Video File: {result} already exists in DB")
                 continue
 
-            query = f'INSERT INTO videos (filename) VALUES ("{file_name}")'
+            query = f'INSERT INTO videos (file_name,file_path) VALUES ("{file_name}","{vid_paths[i]}")'
             dbcursor.execute(query)
 
         db.commit()
@@ -67,17 +70,37 @@ def insert_videos(vid_dir:str="Videos"):
         dbcursor.close()
 
 
-def insert_video_categories(video_name,category_name):
+def category_To_category_id(category_name:str):
+    dbcursor = db.cursor()
+    query = f"SELECT category_id from categories where category_name = '{category_name}'"
+    dbcursor.execute(query)
+    category_id = dbcursor.fetchone()
+    return category_id[0]
+
+
+def video_To_video_id(video_name:str):
+    dbcursor = db.cursor()
+    query = f"SELECT video_id from videos WHERE file_name='{video_name}'"
+    dbcursor.execute(query)
+    video_id = dbcursor.fetchone()
+    return video_id[0]
+
+
+def insert_video_categories(video_name:str):
     dbcursor = db.cursor()
     
     try:
-        query = f"SELECT category_id from categories where category_name = '{category_name}'"
-        dbcursor.execute(query)
-        category_id = dbcursor.fetchone()
+        with open("video_classify.json", "r") as file:
+            indexed_data = json.load(file)
+        
+        for i in range(0,len(indexed_data)):
+            video_id = video_To_video_id(video_name)
+            category_name = f"{indexed_data[f'{i}']["category"]}".strip("[]").replace("'","")
+            category_id = category_To_category_id(category_name)
+            query = f"INSERT INTO video_categories (video_id, category_id) VALUES ('{video_id}','{category_id}');"
+            dbcursor.execute(query)
 
-        query = f"SELECT video_id from videos WHERE filename='{video_name}'"
-        dbcursor.execute(query)
-        video_id = dbcursor.fetchone()
+        db.commit()
 
     except mysql.connector.Error as error:
         print("Error inserting data into MySQL table:", error)
@@ -85,5 +108,6 @@ def insert_video_categories(video_name,category_name):
     finally:
         dbcursor.close()
 
-insert_imagenet_categories("ImageNet_classes.json")
-insert_videos("Videos")
+# insert_imagenet_categories("ImageNet_classes.json")
+# insert_videos("Shorts_Videos")
+# insert_video_categories("market")

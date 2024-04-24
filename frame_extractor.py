@@ -19,7 +19,7 @@ def get_video_prop(video_path:str):
     cap = cv2.VideoCapture(video_path)
 
     n_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    print(f"Total number of Frames: {n_frames}")
+    print(f"\nTotal number of Frames: {n_frames}")
 
     height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
     width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -108,7 +108,7 @@ def extract_keyframes_2(video_path:str, output_dir:str='key_frames',skip_frame_r
     prepare_output_dir(output_dir)
 
     total_frames, fps, height, width = get_video_prop(video_path)
-
+    n_extracted_frames = 0
     for current_frame in tqdm(range(0, total_frames, skip_frame_rate), desc="Extracting Keyframes",unit='frame', ncols=100):
         ret, frame = cap.read()
         if not ret:
@@ -120,11 +120,13 @@ def extract_keyframes_2(video_path:str, output_dir:str='key_frames',skip_frame_r
                     # Save dissimilar frame
                     frame_filename = os.path.join(output_dir, f"frame_{current_frame:04d}.png")
                     cv2.imwrite(frame_filename, frame)
+                    n_extracted_frames+=1
         else:
                 frame_filename = os.path.join(output_dir, f"frame_{current_frame:04d}.png")
-                cv2.imwrite(frame_filename, frame)    
+                cv2.imwrite(frame_filename, frame)
+                n_extracted_frames+=1 
 
         prev_frame = frame
 
     cap.release()
-    print("\nExtraction complete.")
+    print(f"Total key frames based on the threshold chosen : {n_extracted_frames}")

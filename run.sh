@@ -1,4 +1,4 @@
-echo Setting up virtual environment
+echo Switching to virtual environment
 python3 -m venv venv
 source venv/bin/activate
 

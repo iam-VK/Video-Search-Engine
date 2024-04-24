@@ -1,6 +1,5 @@
 import glob
 import re
-import os
 import json
 
 def vidName_from_path(vid_dir_path:str="Videos"):
@@ -35,12 +34,17 @@ def json_parser(input_data,img_dir:str="key_frames"):
     frame_ids = [str(re.findall("frame_[0-9]*",name)).replace("['","").replace("']","") for name in old_files]
 
     data = {}
+
+    from mysql_DB import category_To_category_id
+
     for i, line in enumerate(lines):
         items = [item.strip() for item in line.split(',')]
-        data[frame_ids[i]] = items
+        category_id = category_To_category_id(line)
+        data[i] = {"frame_id":frame_ids[i],
+                   "category_id":category_id,
+                   "category":items}
 
-    json_data = json.dumps(data, indent=4)
+    # json_data = json.dumps(data, indent=4)
 
-    print(json_data)
     with open("video_classify.json", "w") as file:
         json.dump(data, file)
