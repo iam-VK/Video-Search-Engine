@@ -4,7 +4,7 @@ import glob
 from MY_modules import vidName_from_path
 
 '''
-mysqldump -u groot -p search_engine videos categories video_categories > "D:\\Code Space\\Projects\\Video Transcription\\DB_Backup.sql"
+mysqldump -u groot -p search_engine videos categories video_categories > "D:\\Code Space\\Projects\\Video Transcription\\SETUP\\DB_Backup.sql"
 '''
 
 db = mysql.connector.connect(
@@ -35,7 +35,7 @@ def insert_imagenet_categories(json_file):
         print("------------INSERT INTO categories: Successful------------")
 
     except mysql.connector.Error as error:
-        print("Error inserting data into MySQL table:", error)
+        print("Error inserting ImageNet categories into categories table:", error)
 
     finally:
         dbcursor.close()
@@ -64,26 +64,82 @@ def insert_videos(vid_dir:str="Videos"):
         print("------------INSERT INTO videos: Successful------------")
 
     except mysql.connector.Error as error:
-        print("Error inserting data into MySQL table:", error)
+        print("Error inserting video data into videos table:", error)
 
     finally:
         dbcursor.close()
 
 
 def category_To_category_id(category_name:str):
-    dbcursor = db.cursor()
-    query = f"SELECT category_id from categories where category_name = '{category_name}'"
-    dbcursor.execute(query)
-    category_id = dbcursor.fetchone()
-    return category_id[0]
+    try:
+        dbcursor = db.cursor()
+        query = f"SELECT category_id from categories where category_name = '{category_name}'"
+        dbcursor.execute(query)
+        category_id = dbcursor.fetchone()
+
+    except mysql.connector.Error as error:
+        print("Error extracting category_id from categories table:", error)
+    finally:
+        dbcursor.close()
+        return category_id[0]
 
 
 def video_To_video_id(video_name:str):
+    try:
+        dbcursor = db.cursor()
+        query = f"SELECT video_id from videos WHERE file_name='{video_name}'"
+        dbcursor.execute(query)
+        video_id = dbcursor.fetchone()
+        
+    except mysql.connector.Error as error:
+        print("Error extracting video_id from videos table:", error)
+    finally:
+        dbcursor.close()
+        return video_id[0]
+
+
+def check_indexed_state(video_name:str):
     dbcursor = db.cursor()
-    query = f"SELECT video_id from videos WHERE file_name='{video_name}'"
-    dbcursor.execute(query)
-    video_id = dbcursor.fetchone()
-    return video_id[0]
+    try:
+        query = f"SELECT index_state from videos WHERE file_name='{video_name}'"
+        dbcursor.execute(query)
+        index_state = dbcursor.fetchone()
+
+    except mysql.connector.Error as error:
+        print("Error retriving index_state:", error)
+
+    finally:
+        dbcursor.close()
+        return index_state[0]
+
+
+def sort_video_categories_table():
+    dbcursor = db.cursor()
+    
+    try:
+        count_frequency = '''UPDATE video_categories AS vc
+                INNER JOIN (
+                SELECT video_id, category_id, COUNT(*) AS frequency
+                FROM video_categories
+                GROUP BY video_id, category_id
+                ) AS freq_table
+                ON vc.video_id = freq_table.video_id AND vc.category_id = freq_table.category_id
+                SET vc.frequency = freq_table.frequency;'''
+        sort_table = '''ALTER TABLE video_categories
+                    ORDER BY video_id, frequency DESC;'''
+        
+        dbcursor.execute(count_frequency)
+        dbcursor.execute(sort_table)
+
+        db.commit()
+
+        print(f"$$ Table updated with category frequency and sorted")
+
+    except mysql.connector.Error as error:
+        print("Error counting frequency and sorting videos table:", error)
+
+    finally:
+        dbcursor.close()
 
 
 def insert_video_categories(video_name:str):
@@ -92,7 +148,7 @@ def insert_video_categories(video_name:str):
     try:
         with open("video_classify.json", "r") as file:
             indexed_data = json.load(file)
-        
+     
         for i in range(0,len(indexed_data)):
             video_id = video_To_video_id(video_name)
             category_name = f"{indexed_data[f'{i}']["category"]}".strip("[]").replace("'","")
@@ -100,6 +156,10 @@ def insert_video_categories(video_name:str):
             query = f"INSERT INTO video_categories (video_id, category_id) VALUES ('{video_id}','{category_id}');"
             dbcursor.execute(query)
 
+            query = f"UPDATE videos SET index_state = 1 WHERE video_id = {video_id};"
+            dbcursor.execute(query)
+            print(f"$$ New video {video_name} indexed")
+        
         db.commit()
 
     except mysql.connector.Error as error:
