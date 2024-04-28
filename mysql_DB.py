@@ -41,7 +41,7 @@ def insert_imagenet_categories(json_file):
         dbcursor.close()
 
 
-def insert_videos(vid_dir:str="Videos"):
+def insert_videos(vid_dir:str="Shorts_Videos"):
     dbcursor = db.cursor()
 
     try:
@@ -168,6 +168,33 @@ def insert_video_categories(video_name:str):
     finally:
         dbcursor.close()
 
+
+def search_video(search_tag:str):
+    try:
+        dbcursor = db.cursor()
+        query = f"select file_path,file_name,category_name from search_engine.video_index where category_name like '%{search_tag}%';"
+        dbcursor.execute(query)
+        result=dbcursor.fetchall()
+        if result:
+            path = result[0][0]
+            file_name = result[0][1]
+            category_list = result[0][2]
+            search_result = {"file_path":path,
+                             "file_name":file_name,
+                             "category_list":category_list}
+            # print("Video Search Results:")
+            # print("File_name: ",file_name)
+            # print("Path: ",path)
+            # print("Category: ",category_list)
+            return search_result
+        else:
+            print("$$ No match Found")
+
+    except mysql.connector.Error as error:
+        print("Error Searching video from Video_Index:", error)
+
+
 # insert_imagenet_categories("ImageNet_classes.json")
 # insert_videos("Shorts_Videos")
 # insert_video_categories("market")
+# search_video("pencil")

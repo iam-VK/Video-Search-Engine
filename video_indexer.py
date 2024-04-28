@@ -3,9 +3,11 @@ import os
 from tqdm import tqdm
 from frame_extractor import extract_keyframes_2
 from image_classifier import img_classification_model
-from mysql_DB import insert_imagenet_categories, insert_videos, insert_video_categories, check_indexed_state, sort_video_categories_table
+from mysql_DB import insert_videos, insert_video_categories, check_indexed_state, sort_video_categories_table
 
 def Index_videos(vid_dir_path:str):
+    insert_videos(vid_dir_path)
+
     vid_paths = glob.glob(vid_dir_path+'/*')
     
     for video in tqdm(vid_paths, desc="Indexing Videos",unit="videos",ncols=100):
@@ -17,9 +19,12 @@ def Index_videos(vid_dir_path:str):
             insert_video_categories(vid_name)
         else:
             print(f"\n$$ {vid_name} already indexed")
+    sort_video_categories_table()
 
-insert_videos("Shorts_Videos")
-insert_imagenet_categories("ImageNet_classes.json")
+# insert_videos("Shorts_Videos")
+# insert_imagenet_categories("ImageNet_classes.json")
 
-Index_videos("Shorts_Videos")
-sort_video_categories_table()
+# Index_videos("Shorts_Videos")
+# sort_video_categories_table()
+
+

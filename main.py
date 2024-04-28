@@ -1,28 +1,31 @@
-import sys
-import os
-from frame_extractor import extract_keyframes, extract_keyframes_2
-from image_classifier import img_classification_model
-from mysql_DB import insert_imagenet_categories,insert_videos,insert_video_categories
+from mysql_DB import insert_imagenet_categories,search_video
+from video_indexer import Index_videos
 
-# Scan the video directory to add all videos into the table  
-insert_videos("Videos")
-insert_imagenet_categories("ImageNet_classes.json")
+while (True):
+    option = int(input('''
+~#~~#~#~#~#~#~#~#~#~# Search Engine ~#~~#~#~#~#~#~#~#~#~#
+                                              
+                    1. Search Video
+                    2. Add Videos -> Index Videos
+                    3. exit
+                    >> '''))
+    if (option == 1):
+        search_query = "0"
+        while (search_query != "exit" or ""):
+            search_query = input("\nSearch Query:\n>")
+            result = search_video(search_query)
+            try:
+                print("File Name: ",result['file_name'])
+                print("File Path: ",result['file_path'])
+                print("File Category: ",result['category_list'])
+            except TypeError as error:
+                continue
 
-if len(sys.argv) > 1:
-    extract_keyframes(sys.argv[1], output_dir="key_frames")
-else:
-    print('''Path to video missing !!''')
-    vid_path = input("Video Path: ")
-    if vid_path:
-        extract_keyframes_2(vid_path,output_dir="key_frames")
-        img_classification_model('key_frames')
-        vid_name = os.path.splitext(os.path.basename(vid_path))[0]
-        insert_video_categories(vid_name)
-    else:
-        vid_path = "Videos/market.mp4"
-        extract_keyframes_2(video_path=vid_path,output_dir="key_frames")
-        img_classification_model('key_frames')
-        vid_name = os.path.splitext(os.path.basename(vid_path))[0]
-        insert_video_categories(vid_name)
+    elif (option == 2):
+        vid_dir_path = input("\n> Video Directory Path: ")
+        insert_imagenet_categories("ImageNet_classes.json")
+        Index_videos(vid_dir_path)
+    elif (option == 3):
+        break
 
 #9.6+8.66+8.77+8.88+8.55=8.89
