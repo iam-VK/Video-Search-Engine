@@ -22,20 +22,17 @@ def insert_imagenet_categories(json_file):
 
     try:
         for class_id, category_name in data.items():
-            query = f'SELECT category_name from categories where category_name="{category_name}"'
-            dbcursor.execute(query)
-            result=dbcursor.fetchone()
-            if result:
-                #print(f"Category class: {result} already exists in DB")
-                continue
-
             sql = f'INSERT INTO categories VALUES ("{class_id}","{category_name}")'
             dbcursor.execute(sql)
         db.commit()
+
         print("------------INSERT INTO categories: Successful------------")
 
     except mysql.connector.Error as error:
-        print("Error inserting ImageNet categories into categories table:", error)
+        if error.errno == 1062:
+            pass
+        else:
+            print("Error inserting ImageNet categories into categories table:", error)
 
     finally:
         dbcursor.close()
@@ -127,16 +124,28 @@ def sort_video_categories_table():
                 SET vc.frequency = freq_table.frequency;'''
         sort_table = '''ALTER TABLE video_categories
                     ORDER BY video_id, frequency DESC;'''
+        create_view = '''CREATE VIEW video_index AS
+                SELECT videos.video_id, videos.file_name, videos.file_path, categories.category_id ,categories.category_name, COUNT(*) AS frequency
+                FROM videos
+                LEFT JOIN video_categories ON videos.video_id = video_categories.video_id
+                LEFT JOIN categories ON video_categories.category_id = categories.category_id
+                GROUP BY videos.video_id, videos.file_name, categories.category_name, categories.category_id;'''
         
-        dbcursor.execute(count_frequency)
+        
         dbcursor.execute(sort_table)
-
+        dbcursor.execute(count_frequency)
         db.commit()
 
-        print(f"$$ Table updated with category frequency and sorted")
+        print(f"$$ Table (video_categories) updated with category_frequency and sorted")
+
+        dbcursor.execute(create_view)
+        db.commit()
 
     except mysql.connector.Error as error:
-        print("Error counting frequency and sorting videos table:", error)
+        if error.errno == 1050:
+            pass
+        else:
+            print("Error counting frequency and sorting videos table:", error)
 
     finally:
         dbcursor.close()
@@ -198,3 +207,4 @@ def search_video(search_tag:str):
 # insert_videos("Shorts_Videos")
 # insert_video_categories("market")
 # search_video("pencil")
+# sort_video_categories_table()

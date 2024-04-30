@@ -1,0 +1,34 @@
+.header {
+    margin-top: 25px;
+}
+
+body {
+    background: rgb(2, 16, 25);
+    background-size: cover;
+    font-family: 'Trebuchet MS', sans-serif;
+}
+
+.container {
+    display: inline-block;
+    background-size: cover;
+    font-family: 'Trebuchet MS', sans-serif;
+}
+
+.typed-out {
+    overflow: hidden;
+    border-right: .10em solid #ffa500;
+    white-space: nowrap;
+    animation: typing 1s forwards;
+    font-size: 1.6rem;
+    width: 0;
+}
+
+@keyframes typing {
+    from {
+        width: 0
+    }
+
+    to {
+        width: 100%
+    }
+}

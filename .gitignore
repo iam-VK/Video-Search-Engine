@@ -10,7 +10,10 @@ key_frames/
 keyframes/
 Models/
 temp.py
+node_modules/
 
 # don't ignore
 !requirements.txt
 !ImageNet_classes.json
+!package.json
+!package-lock.json

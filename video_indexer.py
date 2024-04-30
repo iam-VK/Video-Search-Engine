@@ -10,7 +10,7 @@ def Index_videos(vid_dir_path:str):
 
     vid_paths = glob.glob(vid_dir_path+'/*')
     
-    for video in tqdm(vid_paths, desc="Indexing Videos",unit="videos",ncols=100):
+    for video in tqdm(vid_paths, desc="\nIndexing Videos",unit="videos",ncols=100):
         vid_name = os.path.splitext(os.path.basename(video))[0]
         
         if (check_indexed_state(vid_name) == 0):
