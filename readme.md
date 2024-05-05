@@ -11,17 +11,8 @@
 docker compose up
 ```
 After successfully creating the containers   
-### **Step 1:** Video Indexing 
-Videos must be indexed using  
-[http://localhost:5000/add_videos/<vid_dir_path>](http://localhost:5000/add_videos/Shorts_Videos)  
-Sample videos are available in the project directory: 
-- `'Shorts_Videos/'`
 
-Currently only the sample videos present in the project directory can be used with Docker installation.
-Custom video support is available in Local Machine Installation and will be introduced later in Docker version.
-
-### **Step 2:** Search
-Webpage is hosted on [http://localhost:5000/](http://localhost:5000/) 
+Refer [Getting Started After Installation](#getting-started-after-installation)
 
 <br>
 
@@ -74,11 +65,14 @@ python main.py
 ```
 <br>
 
-## Getting Started
+## Getting Started After Installation
 ### **Step 1:** Video Indexing 
 Videos must be indexed using  
 [http://localhost:5000/add_videos/*<vid_dir_path>*](http://localhost:5000/add_videos/<vid_dir_path>)  
 Replace *`<vid_dir_path>`* with custom video directory path with the project directory (move the custom video directory into the project directory)
+
+Currently only the sample videos present in the project directory can be used with [Docker installation](#installation-on-docker).
+Custom video support is available in [Local Machine Installation](#installation-on-local-machine) and will be introduced later in Docker version.
 <br>  
 Sample videos are available in the project directory: 
 - `'Shorts_Videos/'`
