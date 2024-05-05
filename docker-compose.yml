@@ -1,0 +1,30 @@
+version: '1.2'
+name: search_engine
+
+services:
+
+  db:
+    image: mysql:latest
+    container_name: mysqldb
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: groot
+      MYSQL_PASSWORD: iamgroot
+      MYSQL_DATABASE: search_engine
+    
+    volumes:
+      - ./SETUP/:/docker-entrypoint-initdb.d
+    ports:
+      - "3307:3306"
+
+  backend:
+      build: .
+      # image: search_engine:dev3
+      container_name: backend_server
+      restart: unless-stopped
+      depends_on: 
+        - db
+      ports:
+        - "5050:5050" 
+        - "5000:5000"

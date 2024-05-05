@@ -8,7 +8,7 @@ mysqldump -u groot -p search_engine videos categories video_categories > "D:\\Co
 '''
 
 db = mysql.connector.connect(
-    host="localhost",
+    host="db", # for docker::  use "localhost" for non docker execution
     user="groot",
     password="iamgroot",
     database = "search_engine"

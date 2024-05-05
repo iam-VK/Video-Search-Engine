@@ -11,7 +11,7 @@ def vidName_from_path(vid_dir_path:str="Videos"):
     returns a list of video file names
     '''
     vid_files = glob.glob(vid_dir_path+'/*')
-    return [name.replace(".mp4","").replace(vid_dir_path+"\\","") for name in vid_files]
+    return [name.replace(".mp4","").replace(vid_dir_path,"").replace("\\","").replace("/","") for name in vid_files]
 
 
 def imgPath_To_List (keyframes_dir_path:str="key_frames"):

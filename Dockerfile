@@ -1,28 +1,48 @@
 FROM python:3.12
 
 WORKDIR /app 
-COPY frame_extractor.py      \
-    img_to_text_model.py    \
+COPY API.py                 \ 
+    frame_extractor.py      \
+    image_classifier.py     \
+    video_indexer.py        \
+    ImageNet_classes.json   \
+    index.html              \
     main.py                 \
-    summarizer_model.py     \
-    requirements.txt        \
-    venv/                   \
+    MY_modules.py           \
+    mysql_DB.py             \
+    package-lock.json       \
+    package.json            \
+    vite.config.js          \
     /app/
 
-RUN mkdir /Model
-RUN mkdir /Model/bart-large-cnn/
-RUN mkdir /Model/blip-image-captioning-large/
+RUN mkdir /app/src
+COPY src/ /app/src
 
-COPY Model/bart-large-cnn/ /Model/bart-large-cnn/
-COPY Model/blip-image-captioning-large/ /Model/blip-image-captioning-large/
+RUN mkdir /app/SETUP
+COPY SETUP/ /app/SETUP
 
-RUN mkdir /Videos
-COPY Videos/ /Videos/
+RUN mkdir /app/Models
+RUN mkdir /app/Models/vit-base-patch16-224/
+COPY Models/vit-base-patch16-224/ /app/Models/vit-base-patch16-224/
 
-RUN pip install -r requirements.txt
+RUN mkdir /app/Shorts_Videos
+COPY Shorts_Videos/ /app/Shorts_Videos/
 
 RUN apt update
 RUN apt-get install libgl1-mesa-glx -y
 
-# CMD ["python", "main.py"]
-CMD ["sleep","3600"]
+RUN apt-get install -y default-mysql-client
+# RUN mysql -ugroot -piamgroot -P 3306 -h db < /app/SETUP/DB_Dump.sql
+
+RUN apt-get install -y curl sudo
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+RUN apt-get install -y nodejs
+
+RUN npm install 
+
+RUN pip install -r /app/SETUP/requirements.txt
+
+EXPOSE 5050
+EXPOSE 5000
+
+CMD npm run dev -- --host & python API.py

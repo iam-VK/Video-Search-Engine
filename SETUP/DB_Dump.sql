@@ -101,3 +101,10 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2024-04-28 22:46:59
+
+CREATE VIEW video_index AS
+SELECT videos.video_id, videos.file_name, videos.file_path, categories.category_id ,categories.category_name, COUNT(*) AS frequency
+FROM videos
+LEFT JOIN video_categories ON videos.video_id = video_categories.video_id
+LEFT JOIN categories ON video_categories.category_id = categories.category_id
+GROUP BY videos.video_id, videos.file_name, categories.category_name, categories.category_id;
